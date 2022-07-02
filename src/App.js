@@ -1,23 +1,32 @@
-import logo from './logo.svg';
+import React, { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+
 import './App.css';
+import { db } from "./core/firebase";
 
 function App() {
+  const [food, setFood] = useState([]);
+
+  const foodRef = collection(db, "food");
+
+  useEffect(() => {
+    getDocs(foodRef).then((data) => {
+      const food = data.docs.map((doc) => ({...doc.data()}));
+      setFood(food);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }, [foodRef]);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Schools</h1>
+      {food.map((food) => 
+        <div key = {food.id}>
+          <h2>{food.title}</h2>
+          <p>{food.desc}</p>
+        </div>
+      )}
     </div>
   );
 }
